@@ -181,7 +181,7 @@ fn main() {
     let layer_visual = projectutils::layer_map_count(map_of_layers.clone());
 
     let interactions_per_layer = average_interactions_per_layer(&higgs_dataset, map_of_layers);
-    println!("Interactions per layer: {:?}", interactions_per_layer);
+    //println!("Interactions per layer: {:?}", interactions_per_layer);
 }
 #[cfg(test)]
 mod tests {
@@ -225,5 +225,21 @@ mod tests {
             (6, 0),
         ]);
         assert_eq!(interactions_per_layer, expected, "The averages didn't work out");
+    }
+    #[test]
+    fn test_number_of_nodes(){
+        // there are 456626 nodes so my dataset should have 456626 nodes
+        use std::collections::HashSet;
+        let higgs_dataset = projectutils::read_higgs_dataset("/Users/evanl/OneDrive/Desktop/DS210Project/higgs-activity_time.txt.gz")
+            .expect("Failed to load Higgs dataset");
+            let mut nodes: HashSet<usize> = HashSet::new();
+
+        for (source, edges) in &higgs_dataset {
+            nodes.insert(*source); // include source node
+            for (target, _timestamp, _interaction) in edges {
+                nodes.insert(*target); // include target part of the node
+            }
+        }
+        assert_eq!(nodes.len(), 456626, "Not 456626 nodes");
     }
 }
