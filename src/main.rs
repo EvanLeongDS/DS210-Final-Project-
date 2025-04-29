@@ -48,11 +48,12 @@ fn higgs_bfs(dataset: &HashMap<usize, Vec<(usize, usize, String)>>, start: usize
     distance.insert(start, 0);
     queue.push_back(start);
 
+    // perform bfs
     while let Some(v) = queue.pop_front() { // new unprocessed vertex
         if let Some(targets) = dataset.get(&v) { // consider all unprocessed neighbors of v
             for (target, _timestamp, _interaction) in targets {
                 if !distance.contains_key(target) {
-                distance.insert(*target, distance[&v] + 1);
+                distance.insert(*target, distance[&v] + 1); // if there is another layer add 1 to the distance
                 queue.push_back(*target);
                 }
             }
@@ -72,8 +73,8 @@ fn higgs_bfs(dataset: &HashMap<usize, Vec<(usize, usize, String)>>, start: usize
 
 fn most_tweets(dataset: &HashMap<usize, Vec<(usize, usize, String)>>) -> (usize, u32) {
     // Figure out who tweeted the most about the higgs boson 
-    let mut tweet_map: HashMap<usize, u32> = HashMap::new(); // user, # of edges
 
+    let mut tweet_map: HashMap<usize, u32> = HashMap::new(); // user, # of edges
     for (source, target) in dataset.iter() {
         tweet_map.insert(*source, target.len().try_into().unwrap());
     }
@@ -102,6 +103,7 @@ fn find_layers(dataset: &HashMap<usize, Vec<(usize, usize, String)>>) -> HashMap
             receivers.insert(*target);
         }
     }
+    // figure out the origin points in the graph 
     for node in dataset.keys() {
         if !receivers.contains(node) { // if its not in there add it 
             layer_map.insert(*node, 0); // start at distance work our way up 
@@ -123,6 +125,8 @@ fn find_layers(dataset: &HashMap<usize, Vec<(usize, usize, String)>>) -> HashMap
 }
 
 fn average_interactions_per_layer(dataset: &HashMap<usize, Vec<(usize, usize, String)>>, layer_map: HashMap<usize, usize>) -> HashMap<usize, usize> {
+    // Find how many outgoing edges there are for each layer 
+
     let mut interactions_per_layer: HashMap<usize, usize> = HashMap::new();
     let mut users_in_layer: HashMap<usize, Vec<usize>> = HashMap::new();
 
@@ -153,7 +157,6 @@ fn main() {
 
     let higgs_dataset = projectutils::read_higgs_dataset("/Users/evanl/OneDrive/Desktop/DS210Project/higgs-activity_time.txt.gz")
         .expect("Failed to load Higgs dataset");
-    //println!("{:?}", higgs_dataset);
 
     projectutils::print_timestamp(
         "For who found out first",
@@ -179,4 +182,48 @@ fn main() {
 
     let interactions_per_layer = average_interactions_per_layer(&higgs_dataset, map_of_layers);
     println!("Interactions per layer: {:?}", interactions_per_layer);
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::HashMap;
+    #[test]
+    fn test_first_timestamp() {
+        // test the first timestamp function
+        let higgs_dataset = projectutils::read_higgs_dataset("/Users/evanl/OneDrive/Desktop/DS210Project/higgs-activity_time.txt.gz")
+        .expect("Failed to load Higgs dataset");
+        let Some((_, _, timestamp, _)) = find_first_timestamp(&higgs_dataset) else {
+            panic!("Didn't work");
+        };
+    
+        assert_eq!(timestamp, "2012-07-01 00:02:52.000000000", "This is not the first timestamp");
+    }
+    #[test]
+    fn test_most_tweets(){
+        // Make sure the most interactions is 656
+        let higgs_dataset = projectutils::read_higgs_dataset("/Users/evanl/OneDrive/Desktop/DS210Project/higgs-activity_time.txt.gz")
+        .expect("Failed to load Higgs dataset");
+        let (user, interactions) = most_tweets(&higgs_dataset);
+        //println!("User {} has the most interactions with {}", user, interactions);
+        assert!(interactions == 656, "Interactions is not 656");
+        assert_eq!(user, 89805, "Top user ID is not 89805");
+    }
+    #[test]
+    fn test_average_interactions(){
+        let higgs_dataset = projectutils::read_higgs_dataset("/Users/evanl/OneDrive/Desktop/DS210Project/higgs-activity_time.txt.gz")
+            .expect("Failed to load Higgs dataset");
+        let map_of_layers = find_layers(&higgs_dataset);
+        let interactions_per_layer = average_interactions_per_layer(&higgs_dataset, map_of_layers);
+
+        let expected: HashMap<usize, usize> = HashMap::from([ // from chatgpt for simplicity and conciseness
+            (0, 1),
+            (1, 2),
+            (2, 3),
+            (3, 3),
+            (4, 2),
+            (5, 3),
+            (6, 0),
+        ]);
+        assert_eq!(interactions_per_layer, expected, "The averages didn't work out");
+    }
 }
