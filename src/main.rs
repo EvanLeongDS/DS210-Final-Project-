@@ -156,7 +156,7 @@ fn average_interactions_per_layer(dataset: &HashMap<usize, Vec<(usize, usize, St
 fn main() {
     // read and test my functions 
 
-    let higgs_dataset = projectutils::read_higgs_dataset("/Users/evanl/OneDrive/Desktop/DS210Project/higgs-activity_time.txt.gz")
+    let higgs_dataset = projectutils::read_higgs_dataset("higgs-activity_time.txt.gz")
         .expect("Failed to load Higgs dataset");
 
     projectutils::print_timestamp(
@@ -170,17 +170,17 @@ fn main() {
    // );
 
     let (node, distance) = higgs_bfs(&higgs_dataset, 223789);
-    //println!("The farthest node is {} which has distance {:?}", node, distance);
+    println!("The farthest node is {} which has distance {:?}", node, distance);
 
     let (user, interactions) = most_tweets(&higgs_dataset);
-    //println!("User {} has the most interactions with {}", user, interactions);
+    println!("User {} has the most interactions with {}", user, interactions);
 
     let top_ten = projectutils::top_ten_influencers(&higgs_dataset);
-    //println!("Top ten: {:?}", top_ten);
+    println!("Top ten: {:?}", top_ten);
 
     let map_of_layers = find_layers(&higgs_dataset);
     let layer_visual = projectutils::layer_map_count(map_of_layers.clone());
 
     let interactions_per_layer = average_interactions_per_layer(&higgs_dataset, map_of_layers);
-    //println!("Interactions per layer: {:?}", interactions_per_layer);
+    println!("Interactions per layer: {:?}", interactions_per_layer);
 }
