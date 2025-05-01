@@ -8,7 +8,7 @@ mod tests {
     #[test]
     pub fn test_first_timestamp() {
         // test the first timestamp function
-        let higgs_dataset = read_higgs_dataset("higgs-activity_time.txt.gz")
+        let higgs_dataset = read_higgs_dataset("src/higgs-activity_time.txt.gz")
         .expect("Failed to load Higgs dataset");
         let Some((_, _, timestamp, _)) = find_first_timestamp(&higgs_dataset) else {
             panic!("Didn't work");
@@ -19,7 +19,7 @@ mod tests {
     #[test]
     pub fn test_most_tweets(){
         // Make sure the most interactions is 656
-        let higgs_dataset = read_higgs_dataset("higgs-activity_time.txt.gz")
+        let higgs_dataset = read_higgs_dataset("src/higgs-activity_time.txt.gz")
         .expect("Failed to load Higgs dataset");
         let (user, interactions) = most_tweets(&higgs_dataset);
         //println!("User {} has the most interactions with {}", user, interactions);
@@ -28,7 +28,7 @@ mod tests {
     }
     #[test]
     pub fn test_average_interactions(){
-        let higgs_dataset = read_higgs_dataset("higgs-activity_time.txt.gz")
+        let higgs_dataset = read_higgs_dataset("src/higgs-activity_time.txt.gz")
             .expect("Failed to load Higgs dataset");
         let map_of_layers = find_layers(&higgs_dataset);
         let interactions_per_layer = average_interactions_per_layer(&higgs_dataset, map_of_layers);
@@ -48,7 +48,7 @@ mod tests {
     pub fn test_number_of_nodes(){
         // the internet says there should be 304691 nodes to my specific file
         // https://networks.skewed.de/net/twitter_higgs
-        let higgs_dataset = read_higgs_dataset("higgs-activity_time.txt.gz")
+        let higgs_dataset = read_higgs_dataset("src/higgs-activity_time.txt.gz")
             .expect("Failed to load Higgs dataset");
             let mut nodes: HashSet<usize> = HashSet::new();
 
